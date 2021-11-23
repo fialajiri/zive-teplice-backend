@@ -2,8 +2,10 @@ const { validationResult } = require("express-validator");
 const User = require("../models/user");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const HttpError = require("../models/http-error");
+const { sendEmail } = require("../utils/send-email");
 const {
   getToken,
   COOKIE_OPTIONS,
@@ -74,7 +76,7 @@ const login = async (req, res, next) => {
   userFromDb.refreshToken.push({ refreshToken });
 
   try {
-    const savedUser = await userFromDb.save();    
+    const savedUser = await userFromDb.save();
     res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
     res.send({ success: true, token, role: savedUser.role });
   } catch (err) {
@@ -85,7 +87,6 @@ const login = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
-  
 
   if (refreshToken) {
     let payload;
@@ -98,7 +99,6 @@ const refreshToken = async (req, res, next) => {
     }
 
     const userId = payload._id;
-    console.log(userId);
 
     try {
       userFromDb = await User.findById({ _id: userId });
@@ -126,7 +126,7 @@ const refreshToken = async (req, res, next) => {
     try {
       await userFromDb.save();
       res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS);
-      res.send({ success: true, token, role:userFromDb.role });
+      res.send({ success: true, token, role: userFromDb.role });
     } catch (err) {
       new HttpError("Nepodařilo se uložit token v databázi", 500);
     }
@@ -142,8 +142,6 @@ const me = (req, res, next) => {
 const logout = async (req, res, next) => {
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
-
-  
 
   let userFromDb;
 
@@ -174,6 +172,105 @@ const logout = async (req, res, next) => {
   }
 };
 
+const reset = async (req, res, next) => {
+  let token;
+
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      return next(new HttpError(err.message));
+    }
+    token = buffer.toString("hex");
+  });
+
+  let userFromDb;
+
+  try {
+    userFromDb = await User.findOne({ email: req.body.email });
+  } catch (err) {
+    return next(new HttpError("Reset hesla selhal, zkuste to později.", 500));
+  }
+
+  if (!userFromDb) {
+    return next(new HttpError("Uživatel s tímto emailem nebyl nalezen", 401));
+  }
+
+  userFromDb.reset.token = token;
+  userFromDb.reset.tokenExpiration = Date.now() + 60 * 60 * 1000;
+
+  try {
+    await userFromDb.save();
+  } catch (err) {
+    return next(new HttpError("Reset hesla selhal, zkuste to později.", 500));
+  }
+
+  try {
+    sendEmail(
+      req.body.email,
+      "Reset hesla ŽT",
+      `<p>Vyžádali jste si reset hesla</p> <p>Klikněte na tento  <a href="${process.env.WHITELISTED_DOMAINS}/admin/password/reset/${token}">odkaz</a> pro nastevení nového hesla</p>`
+    );
+    res.status(201).send({ success: true });
+  } catch (err) {
+    console.log(err);
+    return next(
+      new HttpError(
+        "Odeslání emailu k resetu hesla selhalo, zkuste to později",
+        500
+      )
+    );
+  }
+};
+
+const postNewPassword = async (req, res, next) => {
+  const newPassword = req.body.password;
+  const passwordToken = req.body.token;
+
+  let resetUser;
+
+  try {
+    resetUser = await User.findOne({ "reset.token": passwordToken });
+  } catch (err) {
+    console.log(err);
+    return next(new HttpError("Reset hesla selhal. Neplatný token.", 500));
+  }
+
+  try {
+    await resetUser.setPassword(newPassword);
+    resetUser.reset = undefined;
+    await resetUser.save();
+    res.status(201).send({ success: true });
+  } catch (err) {
+    console.log(err);
+    return next(new HttpError("Reset hesla selhal, zkuste to později.", 500));
+  }
+};
+
+const changePassword = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new HttpError("Hesla se musí shodovat", 422);
+    error.data = errors.array();
+    return next(error);
+  }
+
+  const newPassword = req.body.newPassword;
+  
+  let userFromDb;
+
+  try {
+    userFromDb = await User.findById(req.user._id);    
+    await userFromDb.setPassword(newPassword);
+    await userFromDb.save();
+    res.status(201).send({ success: true });
+  } catch (err) {
+    console.log(err);
+    return next(new HttpError("Změna hesla selhala, zkuste to později.", 500));
+  }
+};
+
+exports.changePassword = changePassword;
+exports.postNewPassword = postNewPassword;
+exports.reset = reset;
 exports.logout = logout;
 exports.me = me;
 exports.refreshToken = refreshToken;

@@ -29,10 +29,10 @@ const User = new Schema({
     Token: { type: String },
     ExpirationDate: { type: Date },
   },
-  //   reset: {
-  //     Token: { type: String },
-  //     TokenExpiration: { type: Date },
-  //   },
+    reset: {
+      token: { type: String },
+      tokenExpiration: { type: Date },
+    },
 });
 
 User.set("toJSON", {

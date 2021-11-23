@@ -6,7 +6,7 @@ const router = express.Router();
 const User = require("../models/user");
 const authControllers = require("../controllers/auth");
 
-const {verifyUser} = require("../authenticate");
+const { verifyUser } = require("../authenticate");
 
 router.post(
   "/signup",
@@ -36,13 +36,12 @@ router.post(
       .not()
       .isEmpty()
       .custom(async (value) => {
-        
         const user = await User.findOne({ username: value });
         if (user) {
           return Promise.reject(
             "Toto uživatelské jméno již existuje, vyberte prosím jiné."
           );
-        } 
+        }
       }),
     check("phoneNumber").isLength({ min: 9 }).isNumeric(),
     check("description").isLength({ min: 150, max: 350 }),
@@ -61,8 +60,41 @@ router.post(
 );
 
 router.post("/login", passport.authenticate("local"), authControllers.login);
-router.post('/refreshToken', authControllers.refreshToken)
-router.get('/me', verifyUser, authControllers.me)
-router.get('/logout', verifyUser, authControllers.logout);
+router.post("/refreshToken", authControllers.refreshToken);
+router.get("/me", verifyUser, authControllers.me);
+router.get("/logout", verifyUser, authControllers.logout);
+
+router.post("/reset", authControllers.reset);
+router.post(
+  "/reset/:token",
+  [
+    check("password").isLength({ min: 8 }).trim(),
+    check("confirmPassword")
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error("Hesla se musí shodovat");
+        }
+        return true;
+      })
+      .trim(),
+  ],
+  authControllers.postNewPassword
+);
+router.post(
+  "/changePassword",
+  verifyUser,
+  [
+    check("newPassword").isLength({ min: 8 }).trim(),
+    check("confirmNewPassword")
+      .custom((value, { req }) => {
+        if (value !== req.body.newPassword) {
+          throw new Error("Hesla se musí shodovat");
+        }
+        return true;
+      })
+      .trim(),
+  ],
+  authControllers.changePassword
+);
 
 module.exports = router;
