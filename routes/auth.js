@@ -5,11 +5,13 @@ const passport = require("passport");
 const router = express.Router();
 const User = require("../models/user");
 const authControllers = require("../controllers/auth");
+const { fileupload, fileUpload } = require('../middleware/file-upload')
 
 const { verifyUser } = require("../authenticate");
 
 router.post(
   "/signup",
+  fileUpload('users').single('image'),
   [
     check("email")
       .normalizeEmail()
@@ -53,7 +55,7 @@ router.post(
         } else {
           return true;
         }
-      }),
+      }),      
   ],
 
   authControllers.signUp

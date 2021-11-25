@@ -29,33 +29,34 @@ const fileFilter = (req, file, cb) => {
   cb(null, uuidv4() + "." + ext);
 };
 
-const storage = multer.diskStorage({
-  destination: (req, res, cb) => {
-    cb(null, "uploads/images");
-  },
-  filename: (req, file, cb) => {
-    const ext = MIME_TYPE_MAP[file.mimetype]; // extract the extension from the image file
-    cb(null, uuidv4() + "." + ext);
-  },
-});
+const multerS3Config = (destinationPath) =>
+  multerS3({
+    s3: s3Config,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl: "public-read",
+    bucket: bucketName,
+    metadata: (req, file, cb) => {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: (req, file, cb) => {      
+      cb(
+        null,
+        destinationPath +
+          "/" +
+          new Date().toISOString() +
+          "-" +
+          file.originalname
+      );
+    },
+  });
 
-const multerS3Config = multerS3({
-  s3: s3Config,
-  contentType: multerS3.AUTO_CONTENT_TYPE,
-  acl: "public-read",
-  bucket: bucketName,
-  metadata: (req, file, cb) => {
-    cb(null, { fieldName: file.fieldname });
-  },
-  key: (req, file, cb) => {
-    console.log(file);
-    cb(null, new Date().toISOString() + "-" + file.originalname);
-  },
-});
 
-const fileUpload = multer({
-  limits: 500000,
-  storage: multerS3Config,
+
+
+const fileUpload = (destinationPath) =>
+multer({
+  limits: 5000000,
+  storage: multerS3Config(destinationPath),
   fileFilter: fileFilter,
 });
 
@@ -68,3 +69,7 @@ const deleteImage = (key) => {
 
 exports.fileUpload = fileUpload;
 exports.deleteImage = deleteImage;
+
+
+
+

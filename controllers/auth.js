@@ -12,7 +12,7 @@ const {
   getRefreshToken,
 } = require("../authenticate");
 
-const signUp = async (req, res, next) => {
+const signUp = async (req, res, next) => {  
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new HttpError(
@@ -24,12 +24,17 @@ const signUp = async (req, res, next) => {
     return next(error);
   }
 
+  
   const newUser = new User({
     email: req.body.email,
     username: req.body.username,
     phoneNumber: req.body.phoneNumber,
     description: req.body.description,
     type: req.body.type,
+    image: {
+      imageUrl: req.file.location,
+      imageKey: req.file.key,
+    },
   });
 
   User.register(newUser, req.body.password, async (err, user) => {
@@ -254,11 +259,11 @@ const changePassword = async (req, res, next) => {
   }
 
   const newPassword = req.body.newPassword;
-  
+
   let userFromDb;
 
   try {
-    userFromDb = await User.findById(req.user._id);    
+    userFromDb = await User.findById(req.user._id);
     await userFromDb.setPassword(newPassword);
     await userFromDb.save();
     res.status(201).send({ success: true });

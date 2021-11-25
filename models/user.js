@@ -20,19 +20,20 @@ const User = new Schema({
   description: { type: String, required: true },
   type: { type: String, required: true },
   role: { type: String, default: "user" },
-  //   image: {
-  //     imageUrl: { type: String, required: true },
-  //     imageKey: { type: String, required: true },
-  //   },
+  image: {
+    imageUrl: { type: String, required: true },
+    imageKey: { type: String, required: true },
+  },
   verified: {
     status: { type: Boolean, default: "false" },
     Token: { type: String },
     ExpirationDate: { type: Date },
   },
-    reset: {
-      token: { type: String },
-      tokenExpiration: { type: Date },
-    },
+  reset: {
+    token: { type: String },
+    tokenExpiration: { type: Date },
+  },
+  timestamps: {}
 });
 
 User.set("toJSON", {
@@ -42,6 +43,6 @@ User.set("toJSON", {
   },
 });
 
-User.plugin(passportLocalMongoose, {usernameField: 'email'});
+User.plugin(passportLocalMongoose, { usernameField: "email" });
 
 module.exports = mongoose.model("User", User);

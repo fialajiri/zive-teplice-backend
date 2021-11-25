@@ -17,34 +17,23 @@ require("./strategies/LocalStrategy");
 require("./authenticate");
 
 const authRoutes = require("./routes/auth");
+const newsRoutes = require("./routes/news");
+const userRoutes = require('./routes/users')
 
 const app = express();
 
+
 app.use(express.json());
-app.use(upload.array()); 
+// app.use(upload.array());     // nefunguje s multerem!!!!
 
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-const whitelist = process.env.WHITELISTED_DOMAINS
-  ? process.env.WHITELISTED_DOMAINS.split(",")
-  : [];
-
-// const corsOptions = {
-//   origin: function (origin, callback) {
-//     if (!origin || whitelist.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("Not allowed by CORS"));
-//     }
-//   },
-
-//   credentials: true,
-// };
-
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 var corsOptions = {
-    origin: true,
-    credentials: true };
+  origin: true,
+  credentials: true,
+};
 
 app.use(cors(corsOptions));
 
@@ -59,17 +48,16 @@ app.use(cors(corsOptions));
 //   next();
 // });
 
-app.use(helmet());
 
-// app.use(cors(corsOptions));
 
 app.use(passport.initialize());
 
 app.use("/auth", authRoutes);
+app.use("/news", newsRoutes);
+app.use("/users", userRoutes);
 
-app.get("/", function (req, res) {
-  res.send({ status: "success" });
-});
+app.use(helmet());
+
 
 app.use((req, res, next) => {
   const error = new HttpError("Cesta nenalezena.", 404);
@@ -87,15 +75,10 @@ app.use((error, req, res, next) => {
   });
 });
 
+
+
 const server = app.listen(process.env.PORT || 8081, function () {
   const port = server.address().port;
 
   console.log("App started at port:", port);
 });
-
-// mongoose
-//   .connect(mongoDbUrl)
-//   .then(() => {
-//     app.listen(process.env.PORT || 5000);
-//   })
-//   .catch((err) => console.log(err));
