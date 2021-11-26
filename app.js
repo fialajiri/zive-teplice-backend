@@ -12,7 +12,7 @@ const HttpError = require("./models/http-error");
 
 require("./utils/connectdb");
 
-require("./strategies/JwtStrategy");
+require("./strategies/JWTStrategy");
 require("./strategies/LocalStrategy");
 require("./authenticate");
 
