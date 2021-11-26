@@ -136,7 +136,7 @@ const updateNewsItem = async (req, res, next) => {
   newsFromDb.abstract = abstract;
   newsFromDb.message = message;
 
-  if (req.file.image) {
+  if (req.file) {
     newsFromDb.image.imageUrl = req.file.location;
     newsFromDb.image.imageKey = req.file.key;
   }

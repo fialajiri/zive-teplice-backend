@@ -62,8 +62,7 @@ multer({
 
 const deleteImage = (key) => {
   s3Config.deleteObject({ Bucket: bucketName, Key: key }, (err, data) => {
-    console.log(err);
-    console.log(data);
+    
   });
 };
 
