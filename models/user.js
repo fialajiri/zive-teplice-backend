@@ -20,6 +20,8 @@ const User = new Schema({
   description: { type: String, required: true },
   type: { type: String, required: true },
   role: { type: String, default: "user" },
+  event: {type: Schema.Types.ObjectId, ref: "Event"},
+  request: {type: String, default: 'notsend'}, 
   image: {
     imageUrl: { type: String, required: true },
     imageKey: { type: String, required: true },

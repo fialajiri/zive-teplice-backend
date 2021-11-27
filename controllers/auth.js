@@ -83,7 +83,7 @@ const login = async (req, res, next) => {
   try {
     const savedUser = await userFromDb.save();
     res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
-    res.send({ success: true, token, role: savedUser.role });
+    res.send({ success: true, token, user: savedUser });
   } catch (err) {
     return next(new HttpError("Přihlášení selhalo, zkusto to znovu.", 500));
   }
@@ -131,7 +131,7 @@ const refreshToken = async (req, res, next) => {
     try {
       await userFromDb.save();
       res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS);
-      res.send({ success: true, token, role: userFromDb.role });
+      res.send({ success: true, token, user: userFromDb});
     } catch (err) {
       new HttpError("Nepodařilo se uložit token v databázi", 500);
     }
@@ -140,13 +140,15 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
-const me = (req, res, next) => {
+const me = (req, res, next) => {  
   res.send(req.user);
 };
 
 const logout = async (req, res, next) => {
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
+
+  console.log(refreshToken)
 
   let userFromDb;
 

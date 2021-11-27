@@ -92,7 +92,7 @@ const deleteNewsItem = async (req, res, next) => {
   }
 
   const imageKey = news.image.imageKey;
-  console.log(news);
+  
 
   try {
     const currentSession = await mongoose.startSession();

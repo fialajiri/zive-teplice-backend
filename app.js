@@ -19,6 +19,7 @@ require("./authenticate");
 const authRoutes = require("./routes/auth");
 const newsRoutes = require("./routes/news");
 const userRoutes = require('./routes/users')
+const eventRoutes = require('./routes/event')
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.use(passport.initialize());
 app.use("/auth", authRoutes);
 app.use("/news", newsRoutes);
 app.use("/users", userRoutes);
+app.use('/events',eventRoutes )
 
 app.use(helmet());
 
