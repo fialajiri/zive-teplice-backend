@@ -8,6 +8,16 @@ const User = require("../models/user");
 const userControllers = require("../controllers/users.js");
 
 const { verifyUser } = require("../authenticate");
+const { checkRole } = require("../middleware/check-role");
+
+router.post("/request/:uid", verifyUser, userControllers.requestEvent);
+
+router.patch(
+  "/request/:uid",
+  verifyUser,
+  checkRole,
+  userControllers.updateRequest
+);
 
 router.get("/", userControllers.getAllUsers);
 
@@ -16,16 +26,17 @@ router.get("/:uid", userControllers.getUser);
 router.delete("/:uid", verifyUser, userControllers.deleteUser);
 
 router.patch(
-  "/:uid", verifyUser,
+  "/:uid",
+  verifyUser,
   fileUpload("users").single("image"),
   [
     check("username")
       .trim()
       .not()
       .isEmpty()
-      .custom(async (value) => {
+      .custom(async (value, { req }) => {
         const user = await User.findOne({ username: value });
-        if (user) {
+        if (user && user.id.toString() !== req.params.uid) {
           return Promise.reject(
             "Toto uživatelské jméno již existuje, vyberte prosím jiné."
           );

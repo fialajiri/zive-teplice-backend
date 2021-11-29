@@ -113,6 +113,7 @@ const deleteNewsItem = async (req, res, next) => {
 const updateNewsItem = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log(errors)
     const error = new HttpError(
       "Neplatné vstupy, zkontrolujte prosím svá data",
       422
@@ -137,6 +138,10 @@ const updateNewsItem = async (req, res, next) => {
   newsFromDb.message = message;
 
   if (req.file) {
+
+    const imageKey = newsFromDb.image.imageKey;
+    deleteImage(imageKey);
+
     newsFromDb.image.imageUrl = req.file.location;
     newsFromDb.image.imageKey = req.file.key;
   }

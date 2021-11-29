@@ -18,7 +18,7 @@ router.patch(
   fileUpload("news").single("image"),
   [
     check("title").isLength({ min: 10, max: 75 }),
-    check("abstract").isLength({ min: 10, max: 75 }),
+    check("abstract").isLength({ min: 50, max: 175 }),
   ],
   newsController.updateNewsItem
 );

@@ -10,8 +10,8 @@ const { fileUpload } = require("../middleware/file-upload");
 
 router.post(
   "/",
-  //   verifyUser,
-  //   checkRole,
+    verifyUser,
+    checkRole,
   [
     check("title").trim().isLength({ min: 10, max: 100 }),
     check("year").isNumeric().isLength({ min: 4, max: 4 }),
@@ -30,6 +30,15 @@ router.post(
   fileUpload("program").single("image"),
   [check("title").trim().isLength({ min: 10, max: 100 })],
   eventController.addProgram
+);
+
+router.patch(
+  "/program/:eid",
+  verifyUser,
+  checkRole,
+  fileUpload("program").single("image"),
+  [check("title").trim().isLength({ min: 10, max: 100 })],
+  eventController.updateProgram
 );
 
 module.exports = router;

@@ -24,13 +24,22 @@ const createEvent = async (req, res, next) => {
 
   try {
     lastEvent = await Event.findOne({ current: "true" });
-    lastEvent.current = false;
-    await lastEvent.save();
   } catch (err) {
     console.log(err);
     return next(
       new HttpError("Vytváření eventu selhalo, prosím zkuste to znovu", 500)
     );
+  }
+
+  if (lastEvent) {
+    try {
+      lastEvent.current = false;
+      await lastEvent.save();
+    } catch (err) {
+      return next(
+        new HttpError("Vytváření eventu selhalo, prosím zkuste to znovu", 500)
+      );
+    }
   }
 
   const newEvent = new Event({
@@ -46,6 +55,18 @@ const createEvent = async (req, res, next) => {
     return next(
       new HttpError("Vytváření eventu selhalo, prosím zkuste to znovu", 500)
     );
+  }
+
+  let users;
+
+  try {
+    users = await User.find();
+    users.forEach(async (user) => {
+      user.request = "notsend";
+      await user.save();
+    });
+  } catch (err) {
+    console.log(err);
   }
 
   res.status(201).send({ success: true });
@@ -69,13 +90,13 @@ const getCurrent = async (req, res, next) => {
   let currentEvent;
 
   try {
-    currentEvent = await Event.findOne({ current: "true" }).populate('program');
+    currentEvent = await Event.findOne({ current: "true" }).populate("program");
   } catch (err) {
     return next(HttpError("Načítání eventu selhalo, zkuste to později", 500));
   }
 
-  if (!currentEvent){
-     return res.status(200).json({event: []})
+  if (!currentEvent) {
+    return res.status(200).json({ event: [] });
   }
 
   res.status(200).json({ event: currentEvent.toObject({ getters: true }) });
@@ -122,13 +143,13 @@ const addProgram = async (req, res, next) => {
     title: req.body.title,
     message: req.body.message,
     image: {
-        imageUrl: req.file.location,
-        imageKey: req.file.key,
-      },
+      imageUrl: req.file.location,
+      imageKey: req.file.key,
+    },
   });
 
   const event = await Event.findById(eventId);
-  
+
   event.program = newProgram;
 
   const savedEvent = await event.save();
@@ -137,6 +158,44 @@ const addProgram = async (req, res, next) => {
   res.status(200).json({ event: savedEvent });
 };
 
+const updateProgram = async (req, res, next) => {
+  const eventId = req.params.eid;
+
+  let eventFromDb;
+  let eventProgram;
+
+  try {
+    eventFromDb = await Event.findById(eventId).populate("program");
+    eventProgram = await Program.findById(eventFromDb.program.id.toString());
+  } catch (err) {
+    return next(
+      new HttpError("Načítání eventu selhalo, zkuste to později.", 500)
+    );
+  }
+
+  eventProgram.title = req.body.title;
+  eventProgram.message = req.body.message;
+
+  if (req.file) {
+    const imageKey = eventProgram.image.imageKey;
+    deleteImage(imageKey);
+
+    eventProgram.image.imageUrl = req.file.location;
+    eventProgram.image.imageKey = req.file.key;
+  }
+
+  try {
+    await eventProgram.save();
+  } catch (err) {
+    return next(
+      new HttpError("Změna programu selhala, prosím zkuste to znovu.")
+    );
+  }
+
+  res.status(200).json({ success: true });
+};
+
+exports.updateProgram = updateProgram;
 exports.addProgram = addProgram;
 exports.createEvent = createEvent;
 exports.getEvents = getEvents;
