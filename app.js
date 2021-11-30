@@ -20,6 +20,7 @@ const authRoutes = require("./routes/auth");
 const newsRoutes = require("./routes/news");
 const userRoutes = require('./routes/users')
 const eventRoutes = require('./routes/event')
+const galleryRoutes = require('./routes/gallery')
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use("/auth", authRoutes);
 app.use("/news", newsRoutes);
 app.use("/users", userRoutes);
 app.use('/events',eventRoutes )
+app.use('/gallery',galleryRoutes )
 
 app.use(helmet());
 

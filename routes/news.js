@@ -1,6 +1,6 @@
 const express = require("express");
 const { check, body } = require("express-validator");
-const passport = require("passport");
+
 const { fileUpload } = require("../middleware/file-upload");
 
 const router = express.Router();

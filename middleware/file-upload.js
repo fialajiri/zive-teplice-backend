@@ -38,9 +38,10 @@ const multerS3Config = (destinationPath) =>
     metadata: (req, file, cb) => {
       cb(null, { fieldName: file.fieldname });
     },
-    key: (req, file, cb) => {      
+    key: (req, file, cb) => {
       cb(
         null,
+        
         destinationPath +
           "/" +
           new Date().toISOString() +
@@ -50,25 +51,38 @@ const multerS3Config = (destinationPath) =>
     },
   });
 
-
-
-
 const fileUpload = (destinationPath) =>
-multer({
-  limits: 5000000,
-  storage: multerS3Config(destinationPath),
-  fileFilter: fileFilter,
-});
+  multer({
+    limits: 2000000,
+    storage: multerS3Config(destinationPath),
+    fileFilter: fileFilter,
+  });
+
+
+  const galleryUploadS3 = (destinationPath) => multer({
+    storage: multerS3Config(destinationPath),
+    limits: {fileSize: 20000000},
+    fileFilter: fileFilter
+  }).array('galleryImages', 100)
+
+  // const galleryUploadS3 = multer({
+  //   storage: multerS3Config('gallery'),
+  //   limits: {fileSize: 15000000},
+  //   fileFilter: fileFilter
+  // }).array('imageImage', 100)
+
+// const galleryUpload = ({
+//   multer({
+//     storage: multerS3Config('gallery'),
+//     limits: { fileSize: 15000000 },
+//     fileFilter: fileFilter,
+//   })
+// });
 
 const deleteImage = (key) => {
-  s3Config.deleteObject({ Bucket: bucketName, Key: key }, (err, data) => {
-    
-  });
+  s3Config.deleteObject({ Bucket: bucketName, Key: key }, (err, data) => {});
 };
 
 exports.fileUpload = fileUpload;
 exports.deleteImage = deleteImage;
-
-
-
-
+exports.galleryUploadS3 = galleryUploadS3;

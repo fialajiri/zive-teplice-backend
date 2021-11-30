@@ -58,11 +58,12 @@ const getAllNews = async (req, res, next) => {
   }
 
   res
-    .status(201)
+    .status(200)
     .json({ news: news.map((n) => n.toObject({ getters: true })) });
 };
 
 const getNewsItem = async (req, res, next) => {
+  let newsItem;
   try {
     newsItem = await News.findById(req.params.nid);
   } catch (err) {
@@ -92,7 +93,6 @@ const deleteNewsItem = async (req, res, next) => {
   }
 
   const imageKey = news.image.imageKey;
-  
 
   try {
     const currentSession = await mongoose.startSession();
@@ -113,7 +113,7 @@ const deleteNewsItem = async (req, res, next) => {
 const updateNewsItem = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors)
+    console.log(errors);
     const error = new HttpError(
       "Neplatné vstupy, zkontrolujte prosím svá data",
       422
@@ -138,7 +138,6 @@ const updateNewsItem = async (req, res, next) => {
   newsFromDb.message = message;
 
   if (req.file) {
-
     const imageKey = newsFromDb.image.imageKey;
     deleteImage(imageKey);
 
