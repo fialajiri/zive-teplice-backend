@@ -25,12 +25,7 @@ const User = new Schema({
   image: {
     imageUrl: { type: String, required: true },
     imageKey: { type: String, required: true },
-  },
-  verified: {
-    status: { type: Boolean, default: "false" },
-    Token: { type: String },
-    ExpirationDate: { type: Date },
-  },
+  },  
   reset: {
     token: { type: String },
     tokenExpiration: { type: Date },

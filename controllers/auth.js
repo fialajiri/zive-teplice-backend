@@ -12,7 +12,7 @@ const {
   getRefreshToken,
 } = require("../authenticate");
 
-const signUp = async (req, res, next) => {  
+const signUp = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new HttpError(
@@ -24,7 +24,6 @@ const signUp = async (req, res, next) => {
     return next(error);
   }
 
-  
   const newUser = new User({
     email: req.body.email,
     username: req.body.username,
@@ -83,7 +82,11 @@ const login = async (req, res, next) => {
   try {
     const savedUser = await userFromDb.save();
     res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
-    res.send({ success: true, token, user: savedUser.toObject({ getters: true }) });
+    res.send({
+      success: true,
+      token,
+      user: savedUser.toObject({ getters: true }),
+    });
   } catch (err) {
     return next(new HttpError("Přihlášení selhalo, zkusto to znovu.", 500));
   }
@@ -113,7 +116,14 @@ const refreshToken = async (req, res, next) => {
       );
     }
 
+    if (!userFromDb){
+      return next(
+        new HttpError("Nepodařilo se najíž uživatele v databázi", 401)
+      );
+    }
+
     // Find the refresh token against the user record in database
+
     const tokenIndex = userFromDb.refreshToken.findIndex(
       (item) => item.refreshToken === refreshToken
     );
@@ -131,7 +141,11 @@ const refreshToken = async (req, res, next) => {
     try {
       userFromDb = await userFromDb.save();
       res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS);
-      res.send({ success: true, token, user: userFromDb.toObject({ getters: true })});
+      res.send({
+        success: true,
+        token,
+        user: userFromDb.toObject({ getters: true }),
+      });
     } catch (err) {
       new HttpError("Nepodařilo se uložit token v databázi", 500);
     }
@@ -140,15 +154,13 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
-const me = (req, res, next) => {  
+const me = (req, res, next) => {
   res.send(req.user);
 };
 
 const logout = async (req, res, next) => {
   const { signedCookies = {} } = req;
   const { refreshToken } = signedCookies;
-
-  console.log(refreshToken)
 
   let userFromDb;
 

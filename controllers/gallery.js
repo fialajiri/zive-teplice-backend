@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const { deleteImage } = require("../middleware/file-upload");
 const Gallery = require("../models/gallery");
+const mongoose = require("mongoose");
 
 const getAllGalleries = async (req, res, next) => {
   let galleries;
@@ -58,7 +59,7 @@ const deleteGallery = async(req, res, next) => {
     console.log(err);
     return next(
       new HttpError("Něco se pokazilo, aktualitu nelze odstranit.", 500)
-      
+
     );
   }
 

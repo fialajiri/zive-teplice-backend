@@ -13,8 +13,7 @@ router.post(
   "/signup",
   fileUpload('users').single('image'),
   [
-    check("email")
-      .normalizeEmail()
+    check("email")     
       .isEmail()
       .custom(async (value) => {
         const user = await User.findOne({ email: value });
