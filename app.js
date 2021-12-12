@@ -18,15 +18,13 @@ require("./authenticate");
 
 const authRoutes = require("./routes/auth");
 const newsRoutes = require("./routes/news");
-const userRoutes = require('./routes/users')
-const eventRoutes = require('./routes/event')
-const galleryRoutes = require('./routes/gallery')
+const userRoutes = require("./routes/users");
+const eventRoutes = require("./routes/event");
+const galleryRoutes = require("./routes/gallery");
 
 const app = express();
 
-
 app.use(express.json());
-// app.use(upload.array());     // nefunguje s multerem!!!!
 
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
@@ -39,29 +37,15 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-//   );
-//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
-
-//   next();
-// });
-
-
-
 app.use(passport.initialize());
 
 app.use("/auth", authRoutes);
 app.use("/news", newsRoutes);
 app.use("/users", userRoutes);
-app.use('/events',eventRoutes )
-app.use('/gallery',galleryRoutes )
+app.use("/events", eventRoutes);
+app.use("/gallery", galleryRoutes);
 
 app.use(helmet());
-
 
 app.use((req, res, next) => {
   const error = new HttpError("Cesta nenalezena.", 404);
@@ -78,8 +62,6 @@ app.use((error, req, res, next) => {
     data: error.data || "",
   });
 });
-
-
 
 const server = app.listen(process.env.PORT || 8081, function () {
   const port = server.address().port;

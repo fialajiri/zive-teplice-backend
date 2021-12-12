@@ -49,11 +49,15 @@ const signUp = async (req, res, next) => {
       const refreshToken = getRefreshToken({ _id: user._id });
       user.refreshToken.push({ refreshToken });
       try {
-        await user.save();
+        const savedUser = await user.save();
         res
           .status(201)
           .cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
-          .send({ success: true, token });
+          .send({
+            success: true,
+            token,
+            user: savedUser.toObject({ getters: true }),
+          });
       } catch (err) {
         const error = new HttpError(
           "Registrace uživatele se nezdařila, zkuste to později",
@@ -116,7 +120,7 @@ const refreshToken = async (req, res, next) => {
       );
     }
 
-    if (!userFromDb){
+    if (!userFromDb) {
       return next(
         new HttpError("Nepodařilo se najíž uživatele v databázi", 401)
       );

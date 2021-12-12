@@ -61,9 +61,9 @@ const fileUpload = (destinationPath) =>
 
   const galleryUploadS3 = (destinationPath) => multer({
     storage: multerS3Config(destinationPath),
-    limits: {fileSize: 20000000},
+    limits: {fileSize: 30000000},
     fileFilter: fileFilter
-  }).array('galleryImages', 100)
+  }).array('galleryImages', 150)
 
   // const galleryUploadS3 = multer({
   //   storage: multerS3Config('gallery'),
