@@ -9,7 +9,7 @@ Tento projekt představuje backend k webové aplikaci Živé Teplice. Tato webov
   - Vytváření fotogalerií a nahrávání obrázků
   
 ## Technologie
-  - Backend je napsaný v javascriptu a bězí pomocí Node.js
+  - Backend je napsaný v javascriptu pomocí frameworku Express a bězí na Node.js
   
   - Authorizace a authentikace uživatelů pomocí json web tokenů  
     - jsonwebtoken: 8.5.1
