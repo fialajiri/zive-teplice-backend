@@ -3,7 +3,7 @@
 ## Obecné informace
 Tento projekt představuje backend k webové aplikaci Živé Teplice. Tato webová aplikace slouží jako prostor pro prezentaci a administraci kulturní akce Živé Teplice. Tento backend umožnuje:
 
-  - Autorizaci a authentikaci uživatelů pomicí jwt tokenů a HttpOnly Cookies
+  - Autorizaci a authentikaci uživatelů pomocí jwt tokenů a HttpOnly Cookies
   - Registraci uživatelů
   - Vkládání, editaci a mazání příspěvků a aktualit
   - Vytváření fotogalerií a nahrávání obrázků
