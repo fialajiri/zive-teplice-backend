@@ -45,7 +45,7 @@ router.post(
         }
       }),
     check("phoneNumber").isLength({ min: 9 }),
-    check("description").isLength({ min: 150, max: 350 }),
+    // check("description").isLength({ min: 150, max: 350 }),
     check("type")
       .isLength({ min: 6, max: 9 })
       .custom((value) => {

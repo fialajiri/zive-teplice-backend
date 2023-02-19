@@ -53,7 +53,7 @@ const multerS3Config = (destinationPath) =>
 
 const fileUpload = (destinationPath) =>
   multer({
-    limits: 20000000,
+    limits: 30000000,
     storage: multerS3Config(destinationPath),
     fileFilter: fileFilter,
   });
