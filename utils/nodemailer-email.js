@@ -21,4 +21,4 @@ exports.sendEmailNode = async (to, subject, html) => {
   await transporter.sendMail(mailOptions);
 };
 
-const pass = 'lrA4a0D5@#0p'
+
