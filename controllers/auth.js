@@ -231,7 +231,7 @@ const reset = async (req, res, next) => {
     sendEmailNode(
       req.body.email,
       "Reset hesla ŽT",
-      `<p>Vyžádali jste si reset hesla</p> <p>Klikněte na tento  <a href="${process.env.WHITELISTED_DOMAINS}/admin/password/reset/${token}">odkaz</a> pro nastevení nového hesla</p>`
+      `<p>Vyžádali jste si reset hesla</p> <p>Klikněte na tento  <a href="https://www.ziveteplice.cz/admin/password/reset/${token}">odkaz</a> pro nastevení nového hesla</p>`
     );
     res.status(201).send({ success: true });
   } catch (err) {
