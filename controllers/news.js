@@ -26,8 +26,7 @@ const addNewsItem = async (req, res, next) => {
   }
 
   const newNewsItem = new News({
-    title: req.body.title,
-    abstract: req.body.abstract,
+    title: req.body.title,    
     message: req.body.message,
     date: req.body.date,
     image: {
@@ -123,7 +122,7 @@ const updateNewsItem = async (req, res, next) => {
   }
 
   const newsId = req.params.nid;
-  const { title, abstract, message } = req.body;
+  const { title, message } = req.body;
 
   let newsFromDb;
 
@@ -133,8 +132,7 @@ const updateNewsItem = async (req, res, next) => {
     return next(new HttpError("Něco se pokazilo, nelze najít aktualitu.", 500));
   }
 
-  newsFromDb.title = title;
-  newsFromDb.abstract = abstract;
+  newsFromDb.title = title;  
   newsFromDb.message = message;
 
   if (req.file) {

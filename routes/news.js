@@ -17,8 +17,7 @@ router.patch(
   "/:nid",
   fileUpload("news").single("image"),
   [
-    check("title").isLength({ min: 10, max: 75 }),
-    check("abstract").isLength({ min: 50, max: 175 }),
+    check("title").isLength({ min: 10, max: 75 }),   
   ],
   newsController.updateNewsItem
 );
@@ -29,8 +28,7 @@ router.post(
   fileUpload("news").single("image"),
 
   [
-    check("title").isLength({ min: 10, max: 75 }),
-    check("abstract").isLength({ min:50, max: 175 }),
+    check("title").isLength({ min: 10, max: 75 }),    
   ],
   newsController.addNewsItem
 );
