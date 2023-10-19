@@ -106,7 +106,7 @@ const updateUser = async (req, res, next) => {
   }
 
   const userId = req.params.uid;
-  const { username, phoneNumber, description, type } = req.body;
+  const { username, phoneNumber, description, type, request } = req.body;
 
   let userFromDb;
 
@@ -125,14 +125,15 @@ const updateUser = async (req, res, next) => {
   }
 
   if (req.file) {
-    newsFromDb.image.imageUrl = req.file.location;
-    newsFromDb.image.imageKey = req.file.key;
+    userFromDb.image.imageUrl = req.file.location;
+    userFromDb.image.imageKey = req.file.key;
   }
 
   userFromDb.username = username;
   userFromDb.phoneNumber = phoneNumber;
   userFromDb.description = description;
   userFromDb.type = type;
+  userFromDb.request = request;
 
   try {
     userFromDb = await userFromDb.save();
