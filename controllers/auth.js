@@ -6,7 +6,7 @@ const crypto = require("crypto");
 
 const HttpError = require("../models/http-error");
 const { sendEmail } = require("../utils/send-email");
-const {sendEmailNode} = require('../utils/nodemailer-email')
+// const {sendEmailNode} = require('../utils/nodemailer-email')
 const {
   getToken,
   COOKIE_OPTIONS,
@@ -228,7 +228,7 @@ const reset = async (req, res, next) => {
   }
 
   try {
-    sendEmailNode(
+    sendEmail(
       req.body.email,
       "Reset hesla ŽT",
       `<p>Vyžádali jste si reset hesla</p> <p>Klikněte na tento  <a href="https://www.ziveteplice.cz/admin/password/reset/${token}">odkaz</a> pro nastevení nového hesla</p>`

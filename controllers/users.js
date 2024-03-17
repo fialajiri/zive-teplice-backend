@@ -45,11 +45,9 @@ const getUser = async (req, res, next) => {
 
 const deleteUser = async (req, res, next) => {
   const userId = req.params.uid;
-  let userFromDb;
+  let userFromDb;  
   
-  
-  
-  const isAuth = (req.user.role !== "admin" || req.user._id.toString() === userId)
+  const isAuth = (req.user.role === "admin" || req.user._id.toString() === userId)
   
 
   if (!isAuth) {
